@@ -1,0 +1,25 @@
+#!/bin/bash
+# Pick randomly an image from given folder and set it as wallpaper
+# Script to be called via cron
+FOLDER=$1
+if [ -z $FOLDER ]; then
+  echo "Usage: change_wallpaper FOLDER"
+else
+  PREFIX="'file:///"
+  OLD_WALLP=$(gsettings get org.gnome.desktop.background picture-uri) # will return "'file:///path/to/image'"
+  OLD_WALLP=${OLD_WALLP:9:-1} # remove "'file:///" and the last "'"
+
+  FILES=()
+  for entry in "$FOLDER"/*
+  do
+    if [ -f $entry ] && [ "$entry" != "$OLD_WALLP" ]; then # We don't to set the same image again, so remove it from images list
+      FILES+=($entry)
+    fi
+  done
+  FILES_COUNT=${#FILES[@]}
+  RAND=$[ ( $RANDOM % $FILES_COUNT-1 )  + 1 ]
+
+  NEW_WALLP=file:///${FILES[$RAND]}
+
+  gsettings set org.gnome.desktop.background picture-uri $NEW_WALLP
+fi
