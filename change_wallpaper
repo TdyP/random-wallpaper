@@ -1,6 +1,12 @@
 #!/bin/bash
 # Pick randomly an image from given folder and set it as wallpaper
 # Script to be called via cron
+
+# Weird, but necessary thing to run with cron.
+# export DBUS_SESSION_BUS_ADDRESS environment variable
+PID=$(pgrep gnome-session)
+export DBUS_SESSION_BUS_ADDRESS=$(grep -z DBUS_SESSION_BUS_ADDRESS /proc/$PID/environ|cut -d= -f2-)
+
 FOLDER=$1
 if [ -z $FOLDER ]; then
   echo "Usage: change_wallpaper FOLDER"
